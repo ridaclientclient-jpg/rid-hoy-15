@@ -424,7 +424,19 @@ export default function CourierHome() {
             </div>
           </button>
           <button
-            onClick={() => toast.info('Navegando con GPS...')}
+            onClick={() => {
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`, '_blank');
+                  },
+                  () => toast.error('No se pudo obtener tu ubicacion')
+                );
+              } else {
+                window.open('https://maps.google.com', '_blank');
+              }
+            }}
             className="glass rounded-xl p-3 flex items-center gap-2.5 hover:bg-white/5 transition-colors"
           >
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
@@ -436,7 +448,7 @@ export default function CourierHome() {
             </div>
           </button>
           <button
-            onClick={() => toast.info('Reportando incidencia...')}
+            onClick={() => router.push('/courier/support')}
             className="glass rounded-xl p-3 flex items-center gap-2.5 hover:bg-white/5 transition-colors"
           >
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">

@@ -143,12 +143,11 @@ export default function CourierProfile() {
   };
 
   const menuItems = [
-    { icon: FileText, label: 'Editar perfil', desc: 'Actualizar datos personales', action: () => toast.info('Funcion de edicion proximamente'), color: 'text-purple-400 bg-purple-500/20' },
-    { icon: Bike, label: 'Vehiculo', desc: `${VEHICLE_LABELS[vehicleType]} - ${courier?.vehicle_plate || 'Configuracion'}`, action: () => setIsEditingVehicle(true), color: 'text-orange-400 bg-orange-500/20' },
-    { icon: Bell, label: 'Notificaciones', desc: 'Configuracion de alertas', action: () => toast.info('Notificaciones configuradas'), color: 'text-amber-400 bg-amber-500/20' },
-    { icon: Lock, label: 'Seguridad', desc: 'Cambiar contrasena', action: () => toast.info('Funcion de seguridad'), color: 'text-emerald-400 bg-emerald-500/20' },
-    { icon: FileText, label: 'Terminos', desc: 'Terminos y condiciones', action: () => toast.info('Mostrando terminos...'), color: 'text-purple-400 bg-purple-500/20' },
-    { icon: HelpCircle, label: 'Ayuda', desc: 'Soporte 24/7', action: () => router.push('/courier/support'), color: 'text-pink-400 bg-pink-500/20' },
+    { icon: FileText, label: 'Editar perfil', desc: 'Actualizar datos personales', action: () => router.push('/courier/support'), color: 'text-purple-400 bg-purple-500/20' },
+    { icon: Bike, label: 'Vehiculo', desc: `${VEHICLE_LABELS[vehicleType]} - ${courier?.vehicle_plate || 'Configurar placa'}`, action: () => setIsEditingVehicle(true), color: 'text-orange-400 bg-orange-500/20' },
+    { icon: Bell, label: 'Notificaciones', desc: 'Ver alertas recientes', action: () => router.push('/courier/notifications'), color: 'text-amber-400 bg-amber-500/20' },
+    { icon: Lock, label: 'Seguridad', desc: 'Cambiar contrasena', action: () => router.push('/courier/reset-password'), color: 'text-emerald-400 bg-emerald-500/20' },
+    { icon: HelpCircle, label: 'Ayuda y Soporte', desc: 'Chat con el equipo RIDA', action: () => router.push('/courier/support'), color: 'text-pink-400 bg-pink-500/20' },
   ];
 
   if (loading) {
@@ -175,7 +174,7 @@ export default function CourierProfile() {
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-orange-500 flex items-center justify-center text-2xl font-bold text-white">
               {user?.name?.charAt(0) || 'R'}
             </div>
-            <button onClick={() => toast.info('Funcion de camara no disponible en demo')} className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center border-2 border-rida-dark">
+            <button onClick={() => { const inp = document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.onchange = async (e) => { const file = (e.target as HTMLInputElement).files?.[0]; if (!file) return; toast.info('Foto seleccionada. Sube tu foto desde Editar perfil.'); }; inp.click(); }} className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center border-2 border-rida-dark">
               <Camera className="w-3 h-3 text-white" />
             </button>
           </div>
@@ -226,7 +225,7 @@ export default function CourierProfile() {
           <div className="flex items-center justify-between mt-1.5">
             <span className="text-[10px] text-gray-500">Manten tu calificacion 4.85+</span>
             <button
-              onClick={() => toast.info('Funcion de beneficios proximamente')}
+              onClick={() => toast.info(`Nivel ${level.name}: Haz ${nextLevel ? nextLevel.minDeliveries - totalDeliveries + ' entregas mas para subir a ' + nextLevel.name : 'nivel maximo alcanzado'}`)}
               className="text-[10px] text-orange-400 font-medium hover:underline"
             >
               Ver beneficios
