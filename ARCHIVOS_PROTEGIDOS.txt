@@ -1,0 +1,28 @@
+============================================================
+  🔒 ARCHIVOS PROTEGIDOS - NO TOCAR SIN AVISAR AL USUARIO 🔒
+============================================================
+
+ESTOS ARCHIVOS SON EL MOTOR DEL SISTEMA.
+NUNCA modificarlos sin preguntar primero al usuario.
+
+1. .env                    → Credenciales y claves
+2. next.config.ts          → Configuración base de Next.js
+3. src/lib/supabase.ts     → Conexión a base de datos Supabase
+4. package.json            → Dependencias del proyecto
+5. package-lock.json       → Versiones de dependencias
+6. tsconfig.json           → Configuración de TypeScript
+7. Caddyfile               → Configuración del proxy/servidor
+8. prisma/schema.prisma    → Esquema de base de datos
+9. start-server.sh         → Script de inicio del servidor
+
+🟢 ARCHIVOS SEGUROS PARA MODIFICAR (sin preguntar):
+- src/app/client/*         → Todo del cliente
+- src/app/driver/*         → Todo del conductor
+- src/app/admin/*          → Todo del admin
+- src/app/marketplace/*    → Todo del marketplace
+- src/components/*         → Componentes visuales
+- src/store/*              → Estados de la aplicación
+- public/*                 → Imágenes y archivos estáticos
+- tailwind.config.ts       → Colores y estilos globales
+
+REGLA: Si no estás seguro → PREGUNTA primero.

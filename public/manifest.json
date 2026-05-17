@@ -1,0 +1,27 @@
+{
+  "name": "RIDA SUPREME SYSTEM",
+  "short_name": "RIDA",
+  "description": "Plataforma de transporte y delivery - Client, Driver, Admin & Marketplace",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["transport", "delivery", "business"],
+  "lang": "es",
+  "dir": "ltr",
+  "gcm_sender_id": "auto",
+  "notifications": {
+    "title": "RIDA",
+    "body": "Nueva notificacion de RIDA SUPREME"
+  }
+}
