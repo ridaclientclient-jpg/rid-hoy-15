@@ -272,7 +272,7 @@ export default function TrackPage() {
                   style={{ border: 0 }}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ''}&q=${tokenData.location.lat},${tokenData.location.lng}&zoom=16&maptype=roadmap`}
+                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || 'AIzaSyCjJHchXDupX0bJAQcIIqWZLqkpUKLuVMo'}&q=${tokenData.location.lat},${tokenData.location.lng}&zoom=16&maptype=roadmap`}
                   title="Ubicacion en tiempo real"
                 />
                 {!isExpired && (

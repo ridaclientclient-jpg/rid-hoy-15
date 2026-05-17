@@ -1,6 +1,6 @@
 import { Loader } from '@googlemaps/js-api-loader';
 
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || 'AIzaSyCjJHchXDupX0bJAQcIIqWZLqkpUKLuVMo';
 
 let loader: Loader | null = null;
 
