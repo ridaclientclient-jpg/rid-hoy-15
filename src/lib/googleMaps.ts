@@ -4,22 +4,23 @@ const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || 'AIzaSyCjJHchXDupX0bJ
 
 let loader: Loader | null = null;
 
-if (typeof window !== 'undefined') {
-  loader = new Loader({
-    apiKey: API_KEY,
-    version: 'weekly',
-    libraries: ['places', 'geometry', 'visualization'],
-  });
-}
-
 export async function loadGoogleMaps(): Promise<typeof google> {
+  if (typeof window === 'undefined') {
+    // Return a dummy promise that never resolves during server-side pre-rendering
+    return new Promise(() => {});
+  }
+
   if (!API_KEY) {
     console.error('Google Maps API key not configured (NEXT_PUBLIC_GOOGLE_MAPS_KEY)');
     throw new Error('Google Maps API key not configured');
   }
 
   if (!loader) {
-    throw new Error('Google Maps Loader only available in browser');
+    loader = new Loader({
+      apiKey: API_KEY,
+      version: 'weekly',
+      libraries: ['places', 'geometry', 'visualization'],
+    });
   }
 
   return await loader.load();
