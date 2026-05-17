@@ -35,12 +35,12 @@ export async function GET(request: Request) {
       );
     }
 
-    // ── Create authenticated Supabase client with user JWT ─────
-    // This is critical: the default supabase client uses the anon key,
-    // so RLS policies evaluating auth.uid() would return null.
-    // By creating a client with the user's JWT, auth.uid() resolves correctly.
+    // ── Create clients ─────────────────────────────────────────
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+    const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
     const authClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: {
         headers: {
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
     const period = rawPeriod as Period;
 
     // ── Get driver record ───────────────────────────────────────
-    const { data: driver, error: driverError } = await authClient
+    const { data: driver, error: driverError } = await serviceClient
       .from('drivers')
       .select('id, user_id, status')
       .eq('user_id', user.id)
