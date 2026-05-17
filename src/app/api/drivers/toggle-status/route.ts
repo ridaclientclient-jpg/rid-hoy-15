@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { getAuthClient } from '@/lib/authClient';
+import { getAdminClient } from '@/lib/adminClient';
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
 
-    const db = getAuthClient(token);
+    const db = getAdminClient();
 
     // Check work hours constraint
     if (status === 'online') {

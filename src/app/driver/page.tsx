@@ -145,13 +145,13 @@ export default function DriverHome() {
 
   // Fetch driver data and today's earnings
   const fetchData = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id || !session?.access_token) return;
     try {
-      const { data: driverData } = await supabase
-        .from('drivers')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      const res = await fetch('/api/drivers/profile', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const data = await res.json();
+      const driverData = data.success ? data.driver : null;
 
       if (driverData) {
         setDriver(driverData);
@@ -177,7 +177,7 @@ export default function DriverHome() {
     } catch (err) {
       console.error('Error fetching driver home data:', err);
     }
-  }, [user?.id]);
+  }, [user?.id, session?.access_token]);
 
   useEffect(() => {
     fetchData();
@@ -303,13 +303,13 @@ export default function DriverHome() {
 
   // ─── Break Enforcement Check ────────────────────────
   const checkBreakStatus = useCallback(async () => {
-    if (!user?.id) return false;
+    if (!user?.id || !session?.access_token) return false;
     try {
-      const { data: driver } = await supabase
-        .from('drivers')
-        .select('break_until, total_break_time_min')
-        .eq('user_id', user.id)
-        .single();
+      const res = await fetch('/api/drivers/profile', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const data = await res.json();
+      const driver = data.success ? data.driver : null;
       if (driver?.break_until) {
         const breakTime = new Date(driver.break_until);
         if (breakTime > new Date()) {
@@ -324,7 +324,7 @@ export default function DriverHome() {
     } catch {
       return false;
     }
-  }, [user?.id]);
+  }, [user?.id, session?.access_token]);
 
   // Real-time subscription for new rides
   useEffect(() => {
