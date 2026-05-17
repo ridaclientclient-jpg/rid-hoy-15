@@ -1,98 +1,28 @@
-// Google Maps API — using direct script injection (no Loader class)
+import { Loader } from '@googlemaps/js-api-loader';
+
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
-let loadPromise: Promise<typeof google> | null = null;
+let loader: Loader | null = null;
+
+if (typeof window !== 'undefined') {
+  loader = new Loader({
+    apiKey: API_KEY,
+    version: 'weekly',
+    libraries: ['places', 'geometry', 'visualization'],
+  });
+}
 
 export async function loadGoogleMaps(): Promise<typeof google> {
-  // If already loaded globally, resolve immediately
-  if (typeof window !== 'undefined' && (window as any).google?.maps?.places) {
-    return (window as any).google;
+  if (!API_KEY) {
+    console.error('Google Maps API key not configured (NEXT_PUBLIC_GOOGLE_MAPS_KEY)');
+    throw new Error('Google Maps API key not configured');
   }
 
-  // If currently loading, wait for existing promise
-  if (loadPromise) return loadPromise;
-
-  loadPromise = new Promise((resolve, reject) => {
-    if (!API_KEY) {
-      console.error('Google Maps API key not configured (NEXT_PUBLIC_GOOGLE_MAPS_KEY)');
-      reject(new Error('Google Maps API key not configured'));
-      return;
-    }
-
-    // Remove any existing Google Maps script to prevent duplicates
-    const existing = document.querySelector('script[src*="maps.googleapis.com/maps"]');
-    if (existing) existing.remove();
-
-    const script = document.createElement('script');
-    // Only load libraries we use: places (autocomplete), geometry (distance calc)
-    // No 'marker' library — we use classic google.maps.Marker
-    script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places,geometry,visualization`;
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
-      // Small delay to ensure the API is fully initialized
-      setTimeout(() => {
-        if ((window as any).google?.maps?.places) {
-          resolve((window as any).google);
-        } else {
-          loadPromise = null; // Allow retry
-          reject(new Error('Google Maps loaded but API not available'));
-        }
-      }, 200);
-    };
-
-    script.onerror = () => {
-      loadPromise = null; // Allow retry
-      console.error('Google Maps script failed to load');
-      reject(new Error('Google Maps script failed to load'));
-    };
-
-    // Safety timeout
-    setTimeout(() => {
-      if (!(window as any).google?.maps?.places) {
-        loadPromise = null; // Allow retry
-        reject(new Error('Google Maps load timed out'));
-      }
-    }, 15000);
-
-    document.head.appendChild(script);
-  });
-
-  try {
-    return await loadPromise;
-  } catch (err) {
-    // Clear and retry once
-    console.warn('Google Maps first attempt failed, retrying...', err);
-    loadPromise = null;
-    return (loadPromise = new Promise((resolve, reject) => {
-      const existing = document.getElementById('google-maps-script');
-      if (existing) existing.remove();
-
-      const script = document.createElement('script');
-      script.id = 'google-maps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places,geometry,visualization`;
-      script.async = true;
-      script.defer = true;
-
-      script.onload = () => {
-        setTimeout(() => {
-          if ((window as any).google?.maps?.places) {
-            resolve((window as any).google);
-          } else {
-            reject(new Error('Google Maps retry failed'));
-          }
-        }, 200);
-      };
-
-      script.onerror = () => {
-        reject(new Error('Google Maps retry failed'));
-      };
-
-      document.head.appendChild(script);
-    }));
+  if (!loader) {
+    throw new Error('Google Maps Loader only available in browser');
   }
+
+  return await loader.load();
 }
 
 export async function geocodeAddress(address: string): Promise<{ lat: number; lng: number; formattedAddress: string } | null> {
