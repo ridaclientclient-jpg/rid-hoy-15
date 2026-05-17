@@ -7,7 +7,7 @@ import {
   MessageCircle, Clock, CreditCard, Navigation, Phone, Heart,
   Download, ArrowRight, Star, CheckCircle2, ShieldCheck,
   AlertTriangle, Users, Sparkles, Eye, Banknote, QrCode,
-  Headphones, CalendarDays
+  Headphones, CalendarDays, Package
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -54,6 +54,16 @@ const apps = [
     color: 'from-amber-500 to-orange-500',
     description: 'Sube productos, gestiona categorias, importa desde CSV y controla tu inventario desde un solo lugar.',
     features: ['Subir productos', 'Importar CSV', 'Categorias flexibles', 'Gestion de stock'],
+  },
+  {
+    id: 'courier',
+    title: 'COURIER APP',
+    subtitle: 'Entregas rapidas de marketplace',
+    icon: Package,
+    href: '/courier',
+    color: 'from-rose-500 to-pink-500',
+    description: 'Acepta entregas de tiendas y restaurantes, navega al punto de recogida, entrega al cliente y cobra al instante.',
+    features: ['Entregas en vivo', 'Ganancias inmediatas', 'Navegacion GPS', 'Billetera integrada'],
   },
 ];
 
@@ -401,7 +411,7 @@ export default function Home() {
               Todo lo que necesitas, en un ecosistema
             </h2>
             <p className="text-gray-400 max-w-xl mx-auto">
-              Cuatro aplicaciones disenadas para cubrir cada aspecto de tu experiencia de transporte.
+              Cinco aplicaciones disenadas para cubrir cada aspecto de tu experiencia de transporte y entregas.
             </p>
           </motion.div>
 
