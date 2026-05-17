@@ -1,8 +1,8 @@
-import { Loader } from '@googlemaps/js-api-loader';
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || 'AIzaSyCjJHchXDupX0bJAQcIIqWZLqkpUKLuVMo';
 
-let loader: Loader | null = null;
+let initialized = false;
 
 export async function loadGoogleMaps(): Promise<typeof google> {
   if (typeof window === 'undefined') {
@@ -15,15 +15,24 @@ export async function loadGoogleMaps(): Promise<typeof google> {
     throw new Error('Google Maps API key not configured');
   }
 
-  if (!loader) {
-    loader = new Loader({
+  if (!initialized) {
+    setOptions({
       apiKey: API_KEY,
+      key: API_KEY,
       version: 'weekly',
-      libraries: ['places', 'geometry', 'visualization'],
     });
+    initialized = true;
   }
 
-  return await loader.load();
+  // Load the libraries in parallel using the new functional API
+  await Promise.all([
+    importLibrary('maps'),
+    importLibrary('places'),
+    importLibrary('geometry'),
+    importLibrary('visualization'),
+  ]);
+
+  return window.google;
 }
 
 export async function geocodeAddress(address: string): Promise<{ lat: number; lng: number; formattedAddress: string } | null> {
