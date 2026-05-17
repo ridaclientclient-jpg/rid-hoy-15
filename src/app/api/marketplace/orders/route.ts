@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { getAdminClient } from '@/lib/adminClient';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    FRAUD CHECK ENGINE
@@ -254,7 +255,8 @@ export async function POST(request: NextRequest) {
 
     // ─── Auto-assign courier (optional, best effort) ──────────────────
     try {
-      const { data: availableCourier } = await supabase
+      const adminDb = getAdminClient();
+      const { data: availableCourier } = await adminDb
         .from('couriers')
         .select('id')
         .eq('status', 'online')
@@ -262,18 +264,18 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (availableCourier && order) {
-        await supabase
+        await adminDb
           .from('deliveries')
           .update({ courier_id: availableCourier.id, status: 'assigned' })
           .eq('id', order.id);
 
-        await supabase
+        await adminDb
           .from('couriers')
           .update({ status: 'busy' })
           .eq('id', availableCourier.id);
       }
-    } catch {
-      // Courier assignment is optional
+    } catch (err) {
+      console.error('Courier auto-assignment failed:', err);
     }
 
     // ─── Return success ───────────────────────────────────────────────

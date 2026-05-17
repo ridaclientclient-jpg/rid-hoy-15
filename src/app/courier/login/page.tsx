@@ -40,7 +40,7 @@ export default function CourierLogin() {
       return;
     }
 
-    const result = await login(email, password);
+    const result = await login(email, password, 'courier');
     if (result.success) {
       toast.success('Bienvenido repartidor!');
       router.replace('/courier');

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Store, LayoutDashboard, Package, Grid3X3, ShoppingCart,
@@ -19,6 +20,8 @@ const navItems = [
   { label: 'CSV Import', href: '/marketplace/import', icon: Upload },
   { label: 'Perfil', href: '/marketplace/profile', icon: User },
 ];
+
+const MotionLink = motion(Link);
 
 export default function MarketplaceLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -93,10 +96,11 @@ export default function MarketplaceLayout({ children }: { children: React.ReactN
           {navItems.map((item) => {
             const active = isActive(item.href, item.exact);
             return (
-              <motion.button
+              <MotionLink
                 key={item.href}
+                href={item.href}
+                prefetch={true}
                 onClick={() => {
-                  router.push(item.href);
                   setSidebarOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
@@ -115,7 +119,7 @@ export default function MarketplaceLayout({ children }: { children: React.ReactN
                     className="w-1.5 h-1.5 rounded-full bg-green-500"
                   />
                 )}
-              </motion.button>
+              </MotionLink>
             );
           })}
         </nav>

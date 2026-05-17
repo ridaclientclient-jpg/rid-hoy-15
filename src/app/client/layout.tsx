@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Home, MapPin, Clock, User as UserIcon, Zap, ArrowLeft, LogOut, Store, Gift } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
@@ -84,10 +85,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
-                  <button
+                  <Link
                     key={item.href}
-                    type="button"
-                    onClick={() => { if (pathname !== item.href) router.push(item.href); }}
+                    href={item.href}
+                    prefetch={true}
                     className={`relative flex flex-col items-center gap-0 px-2 py-0.5 rounded-lg transition-all ${
                       isActive ? 'text-cyan-400' : 'text-gray-500 hover:text-gray-300'
                     }`}
@@ -104,7 +105,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                       {item.showCartBadge && <CartBadge />}
                     </div>
                     <span className="text-[8px] font-medium relative z-10">{item.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </div>

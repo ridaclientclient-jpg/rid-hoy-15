@@ -44,7 +44,7 @@ export default function MarketplaceLogin() {
       toast.error('Completa todos los campos');
       return;
     }
-    const result = await login(email, password);
+    const result = await login(email, password, 'vendor');
     if (result.success) {
       toast.success('Bienvenido a RIDA MARKET!');
       router.push('/marketplace');

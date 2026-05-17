@@ -23,7 +23,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    const result = await login(email, password);
+    const result = await login(email, password, 'admin');
     if (result.success) {
       toast.success('Bienvenido al panel de administración');
       router.replace('/admin');

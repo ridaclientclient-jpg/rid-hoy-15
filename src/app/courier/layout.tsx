@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Home, Package, Wallet, User as UserIcon, Zap, ArrowLeft, LogOut, Bell, Menu, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import AuthGuard from '@/components/AuthGuard';
@@ -117,9 +118,10 @@ export default function CourierLayout({ children }: { children: React.ReactNode 
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
-                  <button
+                  <Link
                     key={item.href}
-                    onClick={() => { if (pathname !== item.href) router.push(item.href); }}
+                    href={item.href}
+                    prefetch={true}
                     className={`relative flex flex-col items-center gap-0.5 py-1.5 px-3 rounded-xl transition-all ${
                       isActive ? 'text-orange-400' : 'text-gray-500 hover:text-gray-300'
                     }`}
@@ -133,7 +135,7 @@ export default function CourierLayout({ children }: { children: React.ReactNode 
                     )}
                     <item.icon className="w-5 h-5 relative z-10" />
                     <span className="text-[10px] font-medium relative z-10">{item.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </div>

@@ -45,7 +45,7 @@ export default function DriverLogin() {
       return;
     }
 
-    const result = await login(email, password);
+    const result = await login(email, password, 'driver');
     if (result.success) {
       toast.success('Bienvenido conductor!');
       router.replace('/driver');

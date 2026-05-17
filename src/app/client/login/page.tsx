@@ -46,7 +46,7 @@ export default function ClientLogin() {
       return;
     }
 
-    const result = await login(email, password);
+    const result = await login(email, password, 'client');
     if (result.success) {
       toast.success('Bienvenido a RIDA!');
       router.replace('/client');

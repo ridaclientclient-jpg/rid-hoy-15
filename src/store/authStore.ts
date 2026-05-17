@@ -22,7 +22,7 @@ interface AuthState {
   isLocked: boolean;
   lockedUntil: Date | null;
 
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string, requiredRole?: 'client' | 'driver' | 'admin' | 'super_admin' | 'vendor' | 'courier') => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, phone: string, password: string, role: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   initAuth: () => Promise<void>;
@@ -58,17 +58,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initAuth: async () => {
     // Deduplicate concurrent calls
     if (_initAuthPromise) {
-      try {
-        const result = await Promise.race([
-          _initAuthPromise.then(() => 'resolved'),
-          new Promise<string>((r) => setTimeout(() => r('pending'), 0)),
-        ]);
-        if (result === 'resolved') {
-          _initAuthPromise = null;
-        }
-      } catch {
-        _initAuthPromise = null;
-      }
+      return _initAuthPromise;
     }
 
     _initAuthPromise = (async () => {
@@ -92,6 +82,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
             if (existingProfile) {
               profile = existingProfile;
+              // Self-healing: if phone in profile is empty, null or N/A, but metadata has it, update db
+              const meta = sessionUser.user_metadata || {};
+              if ((!profile.phone || profile.phone === 'N/A' || profile.phone.trim() === '') && meta.phone) {
+                console.log('Self-healing profile phone number from auth metadata:', meta.phone);
+                try {
+                  const { data: updatedProfile } = await supabase
+                    .from('profiles')
+                    .update({ phone: meta.phone })
+                    .eq('id', sessionUser.id)
+                    .select()
+                    .single();
+                  if (updatedProfile) {
+                    profile = updatedProfile;
+                  }
+                } catch (err) {
+                  console.warn('Failed self-healing phone sync:', err);
+                }
+              }
             } else {
               const meta = sessionUser.user_metadata || {};
               const newProfile = {
@@ -172,6 +180,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
             if (existingProfile) {
               profile = existingProfile;
+              // Self-healing: if phone in profile is empty, null or N/A, but metadata has it, update db
+              const meta = sessionUser.user_metadata || {};
+              if ((!profile.phone || profile.phone === 'N/A' || profile.phone.trim() === '') && meta.phone) {
+                console.log('Self-healing profile phone number from auth metadata:', meta.phone);
+                try {
+                  const { data: updatedProfile } = await supabase
+                    .from('profiles')
+                    .update({ phone: meta.phone })
+                    .eq('id', sessionUser.id)
+                    .select()
+                    .single();
+                  if (updatedProfile) {
+                    profile = updatedProfile;
+                  }
+                } catch (err) {
+                  console.warn('Failed self-healing phone sync:', err);
+                }
+              }
             } else {
               const meta = sessionUser.user_metadata || {};
               const newProfile = {
@@ -238,9 +264,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     })()
     .finally(() => { _initAuthPromise = null; });
+
+    await _initAuthPromise;
   },
 
-  login: async (email: string, password: string) => {
+  login: async (email: string, password: string, requiredRole?: 'client' | 'driver' | 'admin' | 'super_admin' | 'vendor' | 'courier') => {
     const state = get();
     if (state.isLocked) {
       const now = new Date();
@@ -323,6 +351,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
 
         if (profile) {
+          // Verify role restriction if provided
+          if (requiredRole) {
+            const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
+            const matchesExpected = requiredRole === 'admin'
+              ? isAdmin
+              : (profile.role === requiredRole);
+
+            if (!matchesExpected) {
+              await supabase.auth.signOut();
+              clearStaleAuthData();
+              set({ user: null, supaUser: null, session: null, isAuthenticated: false, isLoading: false });
+
+              let roleLabel = 'cliente';
+              if (profile.role === 'driver') roleLabel = 'conductor';
+              if (profile.role === 'courier') roleLabel = 'repartidor';
+              if (profile.role === 'vendor') roleLabel = 'vendedor';
+              if (profile.role === 'admin' || profile.role === 'super_admin') roleLabel = 'administrador';
+
+              let destApp = 'Cliente';
+              if (requiredRole === 'driver') destApp = 'Conductor';
+              if (requiredRole === 'courier') destApp = 'Courier';
+              if (requiredRole === 'vendor') destApp = 'Marketplace';
+              if (requiredRole === 'admin') destApp = 'Administración';
+
+              return {
+                success: false,
+                error: `Esta cuenta está registrada como ${roleLabel}. Por favor, inicia sesión en la aplicación de ${destApp} o regístrate con otra cuenta.`
+              };
+            }
+          }
+
           set({
             user: profileToUser(profile),
             supaUser: sessionUser,

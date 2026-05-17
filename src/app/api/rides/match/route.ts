@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getAdminClient } from '@/lib/adminClient';
 
 /**
  * POST /api/rides/match
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
     }
 
     const radius = radius_km || 5;
+    const supabase = getAdminClient();
 
     // Fetch ride details to get origin
     const { data: ride, error: rideFetchErr } = await supabase

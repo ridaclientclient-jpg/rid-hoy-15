@@ -106,10 +106,19 @@ export default function ClientProfile() {
         .eq('id', user.id);
 
       if (error) throw error;
+      
+      // Sync the Zustand store immediately after DB update
+      await useAuthStore.getState().initAuth();
+      
       toast.success('Perfil actualizado correctamente');
       setIsEditing(false);
-    } catch (err) {
-      toast.error('Error al actualizar datos');
+    } catch (err: any) {
+      console.error('Error updating profile:', err);
+      if (err?.message?.includes('profiles_phone_unique') || err?.message?.includes('duplicate key')) {
+        toast.error('El número de teléfono ya está registrado en otra cuenta');
+      } else {
+        toast.error('Error al actualizar datos: ' + (err?.message || ''));
+      }
     } finally {
       setSaving(false);
     }
